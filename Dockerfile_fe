@@ -1,0 +1,14 @@
+FROM node:lts-alpine3.14
+
+WORKDIR /app
+RUN apk update && apk upgrade
+
+COPY ./news_app_fe/ .
+RUN npm install
+RUN npm run build
+
+ENV NUXT_HOST=0.0.0.0 \
+    NUXT_PORT=3000 \
+    HOST=0.0.0.0
+
+ENTRYPOINT ["npm", "start"]

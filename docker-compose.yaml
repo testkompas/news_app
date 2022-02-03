@@ -1,0 +1,56 @@
+version: "3.7"
+services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - 3307:3306
+    env_file:
+      - mysql.env
+    networks:
+      - web
+
+  adminer:
+    image: adminer:latest
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - web
+
+  app_be:
+    build:
+      context: .
+      dockerfile: Dockerfile_be
+    ports:
+      - 8100:8100
+    env_file:
+      - app_be.env
+    depends_on:
+      - mysql
+    restart: on-failure
+    networks:
+      - web
+
+  app_fe:
+    build:
+      context: .
+      dockerfile: Dockerfile_fe
+    ports:
+      - 3000:3000
+    env_file:
+      - app_fe.env
+    depends_on:
+      - app_be
+    restart: on-failure
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  dbdata:
